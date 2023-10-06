@@ -1,23 +1,28 @@
-require("dotenv").config();
-const express = require('express');
-const morgan = require('morgan');
+import dotenv from 'dotenv';
+import express from 'express';
+import morgan from 'morgan';
+// import db from './db/index.js';
+import query from './db/index.js';
 
+dotenv.config();
 const app = express();
-
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 app.use(express.json());
 
 // Get all resturants available in database
-app.get("/api/v1/resturants", (req, res) => {
+app.get("/api/v1/resturants", async (req, res) => {
     try {
+        const results = await query("select * from restaurants");
+        console.log(results);
         res.status(200).json({
             status: 'success',
             data: {
-                resturants: ['mcdonalds', 'kfc', 'starbucks']
+                results,
             }
         })
     } 
     catch (error) {
+        console.log(error);
         res.status(500).json({
             status: 'failed',
             error: "Error while getting resturants data"
