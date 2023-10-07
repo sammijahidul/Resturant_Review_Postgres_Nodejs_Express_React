@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import morgan from 'morgan';
-// import db from './db/index.js';
 import query from './db/index.js';
 
 dotenv.config();
@@ -9,17 +8,24 @@ const app = express();
 // app.use(morgan('dev'));
 app.use(express.json());
 
-// Get all resturants available in database
-app.get("/api/v1/resturants", async (req, res) => {
+// Get all restaurants available in database
+app.get("/api/v1/restaurants", async (req, res) => {
     try {
         const results = await query("select * from restaurants");
-        console.log(results);
-        res.status(200).json({
-            status: 'success',
-            data: {
-                results,
-            }
-        })
+        if(results.rows.length === 0) {
+            res.status(404).json({
+                status: 'failed',
+                message: 'No restaurant information found'
+            })
+        } else {
+            res.status(200).json({
+                status: 'success',
+                results: results.rows.length,
+                data: {
+                    restaurants: results.rows,
+                }
+            })
+        }      
     } 
     catch (error) {
         console.log(error);
@@ -30,15 +36,26 @@ app.get("/api/v1/resturants", async (req, res) => {
     }
 });
 
-// Get a resturant 
-app.get("/api/v1/resturant/:id", (req, res) => {
+// Get a restaurant information
+app.get("/api/v1/restaurant/:id", async (req, res) => {
     try {
-        res.status(200).json({
-            status: 'success',
-            data: {
-                resturant: 'mcdhonalds'
-            }
-        })
+        const {id}= req.params;
+        const result = await query("select * from restaurants where id = $1", [id]);
+        // `select * from restaurants where id = ${id}`
+        // It's a bad practice to use `..... ` this query here, can get attack by sequel injection
+        if(result.rows.length === 0) {
+            res.status(404).json({
+                status: 'failed',
+                data: 'Not found any restaurant by this id'
+            })
+        } else {
+            res.status(200).json({
+                status: 'success',
+                data: {
+                    resturant: result.rows,
+                }
+            })
+        }
     } 
     catch (error) {
         res.status(500).json({
@@ -49,12 +66,20 @@ app.get("/api/v1/resturant/:id", (req, res) => {
 });
 
 // Create a resturant information
-app.post("/api/v1/resturant/create", (req, res) => {
+app.post("/api/v1/restaurant/create", async (req, res) => {
     try {
-        const {} = req.body;
-        res.status(200).json({
+        const {name, location, price_range} = req.body;
+        if (!name || !location || !price_range) {
+            return res.status(400).json({
+                status: 'failed',
+                error: "All fields (name, location, price_range) are required."
+            });
+        }
+        const result = await query("INSERT INTO restaurants (name, location, price_range) values ($1, $2, $3)", [name, location, price_range]); 
+        res.status(201).json({
             status: 'success',
             data: {
+                restaurant: result.rows[0],
             }
         })       
     } 

@@ -2,13 +2,7 @@ import pg from 'pg';
 
 const { Pool } = pg;
  
-const pool = new Pool({
-    user: process.env.PGUSER,
-    host: process.env.PGHOST,
-    database: process.env.PGDATABASE,
-    password: process.env.PGPASSWORD,
-    port: process.env.PGPORT,
-});
+const pool = new Pool();
  
 const query = (text, params, callback) => {
   return pool.query(text, params, callback)
@@ -17,7 +11,13 @@ const query = (text, params, callback) => {
 export default query;
 
 
-
+// {
+//   user: process.env.PGUSER,
+//   host: process.env.PGHOST,
+//   database: process.env.PGDATABASE,
+//   password: process.env.PGPASSWORD,
+//   port: process.env.PGPORT,
+// }
 
 // CREATE TABLE restaurants (
 //     id BIGSERIAL NOT NULL PRIMARY KEY,
