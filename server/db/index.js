@@ -3,11 +3,11 @@ import pg from 'pg';
 const { Pool } = pg;
  
 const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'resturantreview',
-    password: 'Jahidul117531',
-    port: 5432,
+    user: process.env.PGUSER,
+    host: process.env.PGHOST,
+    database: process.env.PGDATABASE,
+    password: process.env.PGPASSWORD,
+    port: process.env.PGPORT,
 });
  
 const query = (text, params, callback) => {
