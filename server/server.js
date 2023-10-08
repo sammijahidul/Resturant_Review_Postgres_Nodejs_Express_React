@@ -40,7 +40,10 @@ app.get("/api/v1/restaurants", async (req, res) => {
 app.get("/api/v1/restaurant/:id", async (req, res) => {
     try {
         const {id}= req.params;
-        const result = await query("select * from restaurants where id = $1", [id]);
+        const result = await query(
+            "select * from restaurants where id = $1", 
+            [id]
+        );
         // `select * from restaurants where id = ${id}`
         // It's a bad practice to use `..... ` this query here, can get attack by sequel injection
         if(result.rows.length === 0) {
@@ -75,7 +78,10 @@ app.post("/api/v1/restaurant/create", async (req, res) => {
                 error: "All fields (name, location, price_range) are required."
             });
         }
-        const result = await query("INSERT INTO restaurants (name, location, price_range) values ($1, $2, $3)", [name, location, price_range]); 
+        const result = await query(
+            "INSERT INTO restaurants (name, location, price_range) values ($1, $2, $3) returning *", 
+            [name, location, price_range]
+        ); 
         res.status(201).json({
             status: 'success',
             data: {
@@ -92,18 +98,30 @@ app.post("/api/v1/restaurant/create", async (req, res) => {
 });
 
 // Update a resturant information
-app.patch("/api/v1/resturant/:updateId", (req, res) => {
+app.patch("/api/v1/restaurant/:id", async (req, res) => {
     try {
-        const {} = req.params.id;
-        res.status(200).json({
-            status: 'success',
-            data: {
-                resturant: 'Information'
-            }
-        })
+        const { id } = req.params;
+        const { name, location, price_range } = req.body;
+        const result = await query(
+            "UPDATE restaurants SET name = $1, location = $2, price_range = $3 where id = $4 returning *",
+            [name, location, price_range, id]
+        );
+        if (result.rows.length === 0) { // Check if the restaurant with the given ID exists
+            return res.status(404).json({
+                status: 'failed',
+                error: 'Restaurant not found'
+            });
+        } else {
+            res.status(200).json({
+                status: 'success',
+                data: {
+                    resturant: result.rows[0]
+                }
+            })
+        }      
     } 
     catch (error) {
-        res.status(500).json({
+         res.status(500).json({
             status: 'failed',
             error: "Error while updating resturant information"
         })       
@@ -111,12 +129,24 @@ app.patch("/api/v1/resturant/:updateId", (req, res) => {
 });
 
 // Delete a resturant information
-app.delete("/api/v1/resturant/:deleteId", (req, res) => {
+app.delete("/api/v1/restaurant/:id", async (req, res) => {
     try {
-        const {} = req.params.id;
-        res.json(200).json({
-            status: 'success'
-        })       
+        const { id } = req.params;
+        const result = await query (
+            "DELETE FROM restaurants where id = $1", 
+            [id]
+        );
+        if(result.rowCount === 0) {
+            res.status(404).json({
+                status: 'failed',
+                message: "Not found any record by this id"
+            })
+        } else {
+            res.status(200).json({
+                status: 'success',
+                message: "Restaurant information deleted"
+            })       
+        }       
     } 
     catch (error) {
         res.status(500).json({
