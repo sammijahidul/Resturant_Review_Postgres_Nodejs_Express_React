@@ -5,7 +5,7 @@ import query from './db/index.js';
 
 dotenv.config();
 const app = express();
-// app.use(morgan('dev'));
+app.use(morgan('dev'));
 app.use(express.json());
 
 // Get all restaurants available in database
