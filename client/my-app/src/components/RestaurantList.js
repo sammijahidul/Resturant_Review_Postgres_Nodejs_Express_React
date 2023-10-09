@@ -21,12 +21,13 @@ const RestaurantList = () => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await RestaurantFinder.delete(`/${id}`)
-            console.log(response);
+            await RestaurantFinder.delete(`/${id}`)
+            setRestaurants(restaurants.filter(value => {
+                return value.id !== id
+            }))
         } 
         catch (error) {
-            console.log('Error while deleting a restaurant', error)
-            
+            console.log('Error while deleting a restaurant', error)           
         }
     }
   
