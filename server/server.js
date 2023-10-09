@@ -1,10 +1,12 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import cors from 'cors';
 import morgan from 'morgan';
 import query from './db/index.js';
 
 dotenv.config();
 const app = express();
+app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
@@ -37,7 +39,7 @@ app.get("/api/v1/restaurants", async (req, res) => {
 });
 
 // Get a restaurant information
-app.get("/api/v1/restaurant/:id", async (req, res) => {
+app.get("/api/v1/restaurants/:id", async (req, res) => {
     try {
         const {id}= req.params;
         const result = await query(
@@ -69,7 +71,7 @@ app.get("/api/v1/restaurant/:id", async (req, res) => {
 });
 
 // Create a resturant information
-app.post("/api/v1/restaurant/create", async (req, res) => {
+app.post("/api/v1/restaurants/create", async (req, res) => {
     try {
         const {name, location, price_range} = req.body;
         if (!name || !location || !price_range) {
@@ -98,7 +100,7 @@ app.post("/api/v1/restaurant/create", async (req, res) => {
 });
 
 // Update a resturant information
-app.patch("/api/v1/restaurant/:id", async (req, res) => {
+app.patch("/api/v1/restaurants/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const { name, location, price_range } = req.body;
@@ -129,7 +131,7 @@ app.patch("/api/v1/restaurant/:id", async (req, res) => {
 });
 
 // Delete a resturant information
-app.delete("/api/v1/restaurant/:id", async (req, res) => {
+app.delete("/api/v1/restaurants/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const result = await query (
