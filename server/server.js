@@ -117,7 +117,7 @@ app.patch("/api/v1/restaurants/:id", async (req, res) => {
             res.status(200).json({
                 status: 'success',
                 data: {
-                    resturant: result.rows[0]
+                    restaurant: result.rows[0]
                 }
             })
         }      

@@ -1,8 +1,10 @@
 import React, {useContext, useEffect} from 'react';
 import RestaurantFinder from '../apis/RestaurantFinder';
 import { RestaurantsContext } from '../context/RestaurantsContext';
+import { useNavigate } from 'react-router-dom';
 
 const RestaurantList = () => {
+    const navigate = useNavigate();
     const {restaurants, setRestaurants} =useContext(RestaurantsContext);
 
     useEffect(() => {
@@ -29,7 +31,11 @@ const RestaurantList = () => {
         catch (error) {
             console.log('Error while deleting a restaurant', error)           
         }
-    }
+    };
+
+    const handleUpdate = (id) => {
+        navigate(`/restaurant/update/${id}`);
+    };
   
   return (
     <div className='list-group'>
@@ -52,7 +58,16 @@ const RestaurantList = () => {
                             <td>{value.location}</td>
                             <td>${value.price_range}</td>
                             <td>reviews</td>
-                            <td><button className='btn btn-warning'>Update</button></td>
+                            <td>
+                                <button 
+                                    onClick={() => 
+                                        handleUpdate(value.id)
+                                    }
+                                    className='btn btn-warning'
+                                >
+                                    Update
+                                </button>
+                            </td>
                             <td>
                                 <button 
                                     onClick={() => 
