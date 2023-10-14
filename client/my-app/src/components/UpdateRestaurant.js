@@ -24,7 +24,7 @@ const UpdateRestaurant = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const updatetRestaurant = await RestaurantFinder.patch(`/${id}`, {
+        await RestaurantFinder.patch(`/${id}`, {
             name,
             location,
             price_range: priceRange

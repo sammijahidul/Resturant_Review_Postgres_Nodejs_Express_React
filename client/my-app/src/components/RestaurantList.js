@@ -36,6 +36,10 @@ const RestaurantList = () => {
     const handleUpdate = (id) => {
         navigate(`/restaurant/update/${id}`);
     };
+
+    const handleRestaurantSelect = (id) => {
+        navigate(`/restaurant/${id}`)
+    };
   
   return (
     <div className='list-group'>
@@ -53,8 +57,13 @@ const RestaurantList = () => {
             <tbody>
                 {restaurants && restaurants.map((value, index) => {
                     return (
-                        <tr key={value.id}>
-                            <td>{value.name}</td>
+                        <tr  
+                            key={value.id}>
+                            <td 
+                                onClick={() => handleRestaurantSelect(value.id)}
+                            >
+                                {value.name}
+                            </td>
                             <td>{value.location}</td>
                             <td>${value.price_range}</td>
                             <td>reviews</td>
