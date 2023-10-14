@@ -21,7 +21,8 @@ const RestaurantList = () => {
         
     }, [setRestaurants]);
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (e, id) => {
+        e.stopPropagation();
         try {
             await RestaurantFinder.delete(`/${id}`)
             setRestaurants(restaurants.filter(value => {
@@ -33,7 +34,8 @@ const RestaurantList = () => {
         }
     };
 
-    const handleUpdate = (id) => {
+    const handleUpdate = (e, id) => {
+        e.stopPropagation();
         navigate(`/restaurant/update/${id}`);
     };
 
@@ -57,20 +59,16 @@ const RestaurantList = () => {
             <tbody>
                 {restaurants && restaurants.map((value, index) => {
                     return (
-                        <tr  
+                        <tr onClick={() => handleRestaurantSelect(value.id)}
                             key={value.id}>
-                            <td 
-                                onClick={() => handleRestaurantSelect(value.id)}
-                            >
-                                {value.name}
-                            </td>
+                            <td>{value.name}</td>
                             <td>{value.location}</td>
                             <td>${value.price_range}</td>
                             <td>reviews</td>
                             <td>
                                 <button 
-                                    onClick={() => 
-                                        handleUpdate(value.id)
+                                    onClick={(e) => 
+                                        handleUpdate(e, value.id)
                                     }
                                     className='btn btn-warning'
                                 >
@@ -79,8 +77,8 @@ const RestaurantList = () => {
                             </td>
                             <td>
                                 <button 
-                                    onClick={() => 
-                                        handleDelete(value.id)
+                                    onClick={(e) => 
+                                        handleDelete(e, value.id)
                                     } 
                                     className='btn btn-danger'
                                 >
