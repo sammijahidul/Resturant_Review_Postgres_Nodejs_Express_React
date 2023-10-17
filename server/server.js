@@ -164,6 +164,29 @@ app.delete("/api/v1/restaurants/:id", async (req, res) => {
     }
 });
 
+// Create A Review on Restaurant
+app.post("/api/v1/restaurants/review/:id", async (req, res) => {
+    try {
+        const {id} = req.params;
+        const {restaurant_id, name, review, rating} = req.body;
+        const newReview = await query(
+            "INSERT INTO reviews (restaurant_id, name, review, rating) values ($1, $2, $3, $4) returning *;", 
+            [id, name, review, rating]
+        );
+        res.status(201).json({
+            status: "success",
+            data: {
+                review: newReview.rows[0],
+            }
+        })       
+    } 
+    catch (error) {
+        res.status(500).json({
+            status: 'failed',
+            message: "Error while creating a review"
+        })       
+    }
+})
 const port = process.env.PORT || 3001;
 
 app.listen(port, () => {
