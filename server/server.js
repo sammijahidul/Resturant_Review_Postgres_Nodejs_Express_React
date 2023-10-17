@@ -42,13 +42,18 @@ app.get("/api/v1/restaurants", async (req, res) => {
 app.get("/api/v1/restaurants/:id", async (req, res) => {
     try {
         const {id}= req.params;
-        const result = await query(
+        const restaurant = await query(
             "select * from restaurants where id = $1", 
             [id]
-        );
         // `select * from restaurants where id = ${id}`
         // It's a bad practice to use `..... ` this query here, can get attack by sequel injection
-        if(result.rows.length === 0) {
+        );
+        const reviews = await query(
+            "select * from reviews where restaurant_id = $1",
+            [id]
+        );
+        
+        if(restaurant.rows.length === 0) {
             res.status(404).json({
                 status: 'failed',
                 data: 'Not found any restaurant by this id'
@@ -57,7 +62,8 @@ app.get("/api/v1/restaurants/:id", async (req, res) => {
             res.status(200).json({
                 status: 'success',
                 data: {
-                    restaurant: result.rows[0],
+                    restaurant: restaurant.rows[0],
+                    reviews: reviews.rows,
                 }
             })
         }
