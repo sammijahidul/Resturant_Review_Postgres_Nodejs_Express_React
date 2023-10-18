@@ -13,7 +13,8 @@ app.use(express.json());
 // Get all restaurants available in database
 app.get("/api/v1/restaurants", async (req, res) => {
     try {
-        const results = await query("select * from restaurants");
+        const results = await query(
+            "select * from restaurants left join (select restaurant_id, COUNT(*), TRUNC(AVG(rating),1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id=reviews.restaurant_id;");
         if(results.rows.length === 0) {
             res.status(404).json({
                 status: 'failed',
@@ -43,7 +44,7 @@ app.get("/api/v1/restaurants/:id", async (req, res) => {
     try {
         const {id}= req.params;
         const restaurant = await query(
-            "select * from restaurants where id = $1", 
+            "select * from restaurants left join (select restaurant_id, COUNT(*), TRUNC(AVG(rating),1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id=reviews.restaurant_id where id = $1;", 
             [id]
         // `select * from restaurants where id = ${id}`
         // It's a bad practice to use `..... ` this query here, can get attack by sequel injection
