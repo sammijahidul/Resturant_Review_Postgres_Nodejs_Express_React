@@ -2,15 +2,17 @@ import React, {useContext, useEffect} from 'react';
 import RestaurantFinder from '../apis/RestaurantFinder';
 import { RestaurantsContext } from '../context/RestaurantsContext';
 import { useNavigate } from 'react-router-dom';
+import StarRating from './StarRating';
 
-const RestaurantList = () => {
-    const navigate = useNavigate();
+const RestaurantList = (props) => {
+    let navigate = useNavigate();
     const {restaurants, setRestaurants} =useContext(RestaurantsContext);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await RestaurantFinder.get("/");
+                console.log(response.data.data);
                 setRestaurants(response.data.data.restaurants)            
             } 
             catch (error) {   
@@ -24,9 +26,10 @@ const RestaurantList = () => {
     const handleDelete = async (e, id) => {
         e.stopPropagation();
         try {
-            await RestaurantFinder.delete(`/${id}`)
-            setRestaurants(restaurants.filter(value => {
-                return value.id !== id
+            const response = await RestaurantFinder.delete(`/${id}`)
+            setRestaurants(
+                restaurants.filter(value => {
+                   return value.id !== id
             }))
         } 
         catch (error) {
@@ -42,6 +45,17 @@ const RestaurantList = () => {
     const handleRestaurantSelect = (id) => {
         navigate(`/restaurant/${id}`)
     };
+
+    const renderRating = (value) => {
+        if(!value.count) {
+            return <span className='text-warning'>0 reviews</span>
+        }
+        return (
+            <>
+                <StarRating rating={value.id}/>
+                <span className='text-warning ml-1'>({value.count})</span>
+            </>            
+    )}
   
   return (
     <div className='list-group'>
@@ -57,14 +71,17 @@ const RestaurantList = () => {
                 </tr>              
             </thead>
             <tbody>
-                {restaurants && restaurants.map((value, index) => {
+                {restaurants && 
+                  restaurants.map((value) => {
                     return (
-                        <tr onClick={() => handleRestaurantSelect(value.id)}
-                            key={value.id}>
+                        <tr 
+                            onClick={() => handleRestaurantSelect(value.id)}
+                            key={value.id}
+                        >
                             <td>{value.name}</td>
                             <td>{value.location}</td>
                             <td>${value.price_range}</td>
-                            <td>reviews</td>
+                            <td>{renderRating(value)}</td>
                             <td>
                                 <button 
                                     onClick={(e) => 
@@ -88,14 +105,6 @@ const RestaurantList = () => {
                         </tr>
                     )
                 })}
-                {/* <tr>
-                    <td>mcdonalds</td>
-                    <td>New York</td>
-                    <td>$3</td>
-                    <td>Rating</td>
-                    <td><button className='btn btn-warning'>Update</button></td>
-                    <td><button className='btn btn-danger'>Delete</button></td>
-                </tr> */}
             </tbody>
         </table>
     </div>

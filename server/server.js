@@ -141,9 +141,13 @@ app.patch("/api/v1/restaurants/:id", async (req, res) => {
 app.delete("/api/v1/restaurants/:id", async (req, res) => {
     try {
         const { id } = req.params;
+
+        await query(
+            "DELETE FROM reviews WHERE restaurant_id = $1", [id]
+        );
+
         const result = await query (
-            "DELETE FROM restaurants where id = $1", 
-            [id]
+            "DELETE FROM restaurants WHERE id= $1", [id]
         );
         if(result.rowCount === 0) {
             res.status(404).json({
@@ -158,6 +162,7 @@ app.delete("/api/v1/restaurants/:id", async (req, res) => {
         }       
     } 
     catch (error) {
+        console.error(error);
         res.status(500).json({
             status: 'failed',
             error: "Error while deleting a resturant info"

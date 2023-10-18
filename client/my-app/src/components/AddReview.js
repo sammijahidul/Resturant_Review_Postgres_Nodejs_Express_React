@@ -9,8 +9,8 @@ const AddReview = () => {
   const { id } = useParams();
   const [name, setName] = useState("");
   const [reviewText, setReviewText] = useState("");
-  const [rating, setRating] = useState("");
-  const { selectedRestaurant, setSelectedRestaurant } = useContext(RestaurantsContext);
+  const [rating, setRating] = useState("1");
+  const {selectedRestaurant, setSelectedRestaurant} = useContext(RestaurantsContext);
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
